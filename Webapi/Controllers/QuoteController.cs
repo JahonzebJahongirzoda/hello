@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Infrastructure.Services;
 using Domain.Entities;
-
+using Domain.Wrapper;
 namespace Webapi.Controllers;
 
 [ApiController]
@@ -17,7 +17,7 @@ public class QuoteController : ControllerBase
 
 
     [HttpGet("GetQuote")]
-    public async Task<string> Get()
+    public async Task<Response<string>> Get()
 
     {
         return await _service.GetQuote();
@@ -25,7 +25,7 @@ public class QuoteController : ControllerBase
 
 
     [HttpGet("GetRand")]
-    public async Task<string> Getbyrand()
+    public async Task<Response<string>> Getbyrand()
 
     {
         return await _service.Getbyrand();
@@ -40,7 +40,7 @@ public class QuoteController : ControllerBase
 
 
     [HttpPut("UpdateQuote")]
-    public async Task<string> Put(Quote quote)
+    public async Task<Response<string>> Put(Quote quote)
 
     {
         return await _service.UpdateQuote(quote);
@@ -56,7 +56,7 @@ public class QuoteController : ControllerBase
 
 
     [HttpDelete("DeleteQuote")]
-    public async Task<string> Delete(int id)
+    public async Task<Response<string>> Delete(int id)
 
     {
         return await _service.DeleteQuote(id);
@@ -66,15 +66,15 @@ public class QuoteController : ControllerBase
 
 
 
-    [HttpGet("Getbyid")]
-    public async Task<List<GetQuoteWithCategoryDto>> Getbyid(int id)
+    [HttpGet("GetQuoteWithCategory")]
+    public async Task<Response<List<GetQuoteWithCategoryDto>>> GetQuotebyCategory(int id)
 
     {
-        return await _service.GetQuoteWithCategory();
+        return await _service.GetQuoteWithCategory(id);
     }
 
     [HttpPost]
-    public async Task<string> Create(Quote quote)
+    public async Task<Response<string>> Create(Quote quote)
     {
         return await _service.AddQuote(quote);
 

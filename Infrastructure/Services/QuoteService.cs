@@ -1,12 +1,16 @@
+using System.Net;
+using System.Runtime.Intrinsics.X86;
 using Dapper;
 using Domain.Entities;
 using Npgsql;
-
+using Domain.Wrapper;
 
 namespace Infrastructure.Services;
 public class QuoteServices
 {
     private string _connectionString;
+    private object result;
+
     public QuoteServices()
     {
         _connectionString = "Server=127.0.0.1;Port=5432;Database=examapi;User Id=postgres;Password=11111111;";
@@ -14,7 +18,7 @@ public class QuoteServices
 
 
 
-    public async Task<string> GetQuote()
+    public async Task<Response<string>> GetQuote()
     {
         using (var connection = new NpgsqlConnection(_connectionString))
 
@@ -24,17 +28,17 @@ public class QuoteServices
                 var sql = "Select * from Quote";
                 var res = await connection.QueryAsync<Quote>(sql);
 
-                return "Success";
+                return new Response<string>("Success");
             }
             catch (System.Exception ex)
             {
-                return $"Error {ex.Message}";
+                return new Response<string>(HttpStatusCode.InternalServerError, ex.Message);
             }
 
         }
     }
 
-    public async Task<string> AddQuote(Quote quote)
+    public async Task<Response<string>> AddQuote(Quote quote)
     {
 
         using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
@@ -43,11 +47,11 @@ public class QuoteServices
             {
                 string sql = $"INSERT INTO Quote (Categoryid, Author,QuoteText) VALUES ({quote.Categoryid}, '{quote.Author}', '{quote.QuoteText}')";
                 var response = await connection.ExecuteAsync(sql);
-                return "Success";
+                return new Response<string>("Success");
             }
             catch (System.Exception ex)
             {
-                return $"Error {ex.Message}";
+                return new Response<string>(HttpStatusCode.InternalServerError, ex.Message);
             }
 
         }
@@ -55,7 +59,7 @@ public class QuoteServices
     }
 
 
-    public async Task<string> Getbyrand()
+    public async Task<Response<string>> Getbyrand()
     {
         using (var connection = new NpgsqlConnection(_connectionString))
 
@@ -64,12 +68,12 @@ public class QuoteServices
             {
                 var sql = "select * from Quote order by random() limit 1";
                 var res = await connection.QueryAsync<Quote>(sql);
-                return "Success";
+                return new Response<string>("Success");
 
             }
             catch (System.Exception ex)
             {
-                return $"Error {ex.Message}";
+                return new Response<string>(HttpStatusCode.InternalServerError, ex.Message);
 
             }
 
@@ -77,7 +81,7 @@ public class QuoteServices
     }
 
 
-    public async Task<string> UpdateQuote(Quote quote)
+    public async Task<Response<string>> UpdateQuote(Quote quote)
     {
 
         using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
@@ -86,11 +90,11 @@ public class QuoteServices
             {
                 string sql = $"UPDATE Quote SET author = '{quote.Author}', quotetext = '{quote.QuoteText}', categoryid = '{quote.Categoryid}' WHERE id = '{quote.id}'; ";
                 var response = await connection.ExecuteAsync(sql);
-                return "Success";
+                return new Response<string>("Success");
             }
             catch (System.Exception ex)
             {
-                return $"Error {ex.Message}";
+                return new Response<string>(HttpStatusCode.InternalServerError, ex.Message);
 
             }
 
@@ -101,7 +105,7 @@ public class QuoteServices
 
 
 
-    public async Task<string> DeleteQuote(int id)
+    public async Task<Response<string>> DeleteQuote(int id)
     {
 
         using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
@@ -111,12 +115,12 @@ public class QuoteServices
             {
                 string sql = $"delete from quote where id ={id}";
                 var response = await connection.ExecuteAsync(sql);
-                return "Success";
+                return new Response<string>("Success");
             }
             catch (System.Exception ex)
             {
 
-                return $"Error {ex.Message}";
+                return new Response<string>(HttpStatusCode.InternalServerError, ex.Message);
             }
 
         }
@@ -124,32 +128,28 @@ public class QuoteServices
     }
 
 
-    public async Task<List<GetQuoteWithCategoryDto>> GetQuoteWithCategory()
+    public async Task<Response<List<GetQuoteWithCategoryDto>>> GetQuoteWithCategory(int id)
     {
 
         using (NpgsqlConnection connection = new NpgsqlConnection(_connectionString))
         {
-            try
-            {
-                string sql = $"select q.id, q.author , q.quotetext , c.name  as CategoryName from quote as q join category as c on q.categoryid  = c.id;";
-                var response = await connection.QueryAsync<GetQuoteWithCategoryDto>(sql);
-                return response.ToList();
 
-            }
-            catch (System.Exception ex)
-            {
+            var sql = $"select q.id, q.author , q.quotetext , c.name  as CategoryName from quote as q join category as c on q.categoryid  = c.id;";
+            var response = await connection.QueryAsync<GetQuoteWithCategoryDto>(sql);
 
-                return null;
-            }
+            return new Response<List<GetQuoteWithCategoryDto>>(response.ToList());
+
+
+
+
 
         }
 
+
+
+
+
+
     }
-
-
-
-
-
-
 }
 

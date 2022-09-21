@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "Webapi/1.0.0": {
         "dependencies": {
+          "Domain": "1.0.0",
           "Infrastructure": "1.0.0",
           "Swashbuckle.AspNetCore": "6.2.3"
         },

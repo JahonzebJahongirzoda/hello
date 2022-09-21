@@ -1,4 +1,4 @@
-using System.Net.Mime;
+
 namespace Domain.Entities;
 public class Quote
 {
